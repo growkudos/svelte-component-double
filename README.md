@@ -1,45 +1,40 @@
-<p>
-  <a href="https://www.npmjs.com/package/svelte-component-double">
-    <img src="https://img.shields.io/npm/v/svelte-component-double.svg" alt="npm version">
-  </a>
-
-  <a href="https://packagephobia.now.sh/result?p=svelte-component-double">
-    <img src="https://packagephobia.now.sh/badge?p=svelte-component-double" alt="install size">
-  </a>
-
-  <a href="https://travis-ci.org/dirv/svelte-component-double">
-    <img src="https://api.travis-ci.org/dirv/svelte-component-double.svg?branch=master"
-         alt="build status">
-  </a>
-
-  <a href="https://github.com/dirv/svelte-component-double/blob/master/LICENSE">
-    <img src="https://img.shields.io/npm/l/svelte-component-double.svg" alt="license">
-  </a>
-</p>
-
 # svelte-component-double
 
-An test double for Svelte components. It works with Vitest, Jest and Jasmine.
+A test double for Svelte 5 components (including non–runes mode components that
+are compiled with Svelte 5). It works with Vitest, Jest and Jasmine. It's a fork
+of [svelte-component-double](https://github.com/dirv/svelte-component-double),
+modified to work with Svelte 5, remove private API use, and to convert to
+TypeScript.
 
-## Installation
+## Building
 
-First install the package:
+Prerequisites:
 
-```bash
-npm install --save-dev svelte-component-double
+- Node version as specified in package.json under the `volta.node` key
+  - [Volta](https://volta.sh/) will automatically install and use the correct
+    version of Node
+
+This library is built using svelte-package:
+
+```shell
+npm install
+npx svelte-package
 ```
+
+The built library can be found in the `dist/` directory.
 
 ## Vitest setup & usage
 
-Create a file in your Vite project, named `test/registerSvelteComponentDouble.js`, with the followig content:
+Create a file in your Vite project, named
+`test/registerSvelteComponentDouble.js`, with the following content:
 
 ```javascript
-import { expect } from 'vitest';
-import * as matchers from 'svelte-component-double/vitest';
+import { expect } from "vitest";
+import * as matchers from "svelte-component-double/vitest";
 
 expect.extend(matchers);
 
-import { componentDouble } from 'svelte-component-double';
+import { componentDouble } from "svelte-component-double";
 
 globalThis.componentDouble = componentDouble;
 ```
@@ -62,38 +57,31 @@ const config = {
 Then you can begin to write mocked tests like this:
 
 ```javascript
-import {
-	describe,
-	it,
-	expect,
-	beforeEach,
-	vi
-} from 'vitest';
-import {
-	render,
-	screen
-} from '@testing-library/svelte';
-import Child from './Child.svelte';
-import Parent from './Parent.svelte';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { render, screen } from "@testing-library/svelte";
+import Child from "./Child.svelte";
+import Parent from "./Parent.svelte";
 
-vi.mock('./Child.svelte', async () => ({
-	default: componentDouble('Child')
+vi.mock("./Child.svelte", async () => ({
+  default: componentDouble("Child"),
 }));
 
-describe('Parent component', () => {
-	beforeEach(Child.reset);
+describe("Parent component", () => {
+  beforeEach(Child.reset);
 
-  it('renders a Child with the right props', () => {
-		render(Parent);
+  it("renders a Child with the right props", () => {
+    render(Parent);
 
     expect(Child).toBeRenderedWithProps({
-      foo: "bar"
+      foo: "bar",
     });
   });
 });
 ```
 
-Since mocks are active for the entire module, you may wish to place mocked tests in a separate test file e.g. `parent.mocks.test.js`, keeping `parent.test.js` free for non-mocked tests.
+Since mocks are active for the entire module, you may wish to place mocked tests
+in a separate test file e.g. `parent.mocks.test.js`, keeping `parent.test.js`
+free for non-mocked tests.
 
 ### Jasmine setup & usage
 
@@ -105,23 +93,25 @@ Add the following helper in `spec/support/jasmine.json`.
 ]
 ```
 
-You'll need to use a mocking tool like [babel-plugin-rewire-exports](https://github.com/asapach/babel-plugin-rewire-exports).
+You'll need to use a mocking tool like
+[babel-plugin-rewire-exports](https://github.com/asapach/babel-plugin-rewire-exports).
 
-In the example below, `Parent` is the component under test, and `Child` is being spied on.
+In the example below, `Parent` is the component under test, and `Child` is being
+spied on.
 
 ```javascript
-import Child, { rewire as rewire$Child, restore } from '../src/Child.svelte';
-import Parent from '../src/Parent.svelte';
+import Child, { rewire as rewire$Child, restore } from "../src/Child.svelte";
+import Parent from "../src/Parent.svelte";
 
-import { componentDouble } from 'svelte-component-double';
+import { componentDouble } from "svelte-component-double";
 
-describe('Parent component', () => {
-  it('renders a Child', () => {
+describe("Parent component", () => {
+  it("renders a Child", () => {
     // ensure JSDOM is set up and ready to go
 
     rewire$Child(componentDouble(Child));
 
-    const el = document.createElement('div');
+    const el = document.createElement("div");
     new Parent({ target: el });
 
     expect(Child).toHaveBeenCalled();
@@ -134,12 +124,12 @@ describe('Parent component', () => {
 
 The `expect(component)` function has the following matchers available.
 
-| Matcher | Description |
-| -------- | ----------- |
-| `toBeRendered()` | Passes if there was at least one instance of the component instantiated in the current document. |
-| `toBeRenderedIn(container)` | Same but with a specific DOM container instead of | `document.body`. |
-| `toBeRenderedWithProps(props)` | Passes if there was at least one instance of the component instantiated with these exact props. |
-| `toBeRenderedWithPropsIn(props, container)` | Same as above but with a specic DOM container instead of `document.body`. |
+| Matcher                                     | Description                                                                                      |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------- |
+| `toBeRendered()`                            | Passes if there was at least one instance of the component instantiated in the current document. |
+| `toBeRenderedIn(container)`                 | Same but with a specific DOM container instead of                                                | `document.body`. |
+| `toBeRenderedWithProps(props)`              | Passes if there was at least one instance of the component instantiated with these exact props.  |
+| `toBeRenderedWithPropsIn(props, container)` | Same as above but with a specic DOM container instead of `document.body`.                        |
 
 ## Identifying stubbed DOM elements
 
@@ -149,18 +139,22 @@ A spied/stubbed component will be rendered into the DOM like this:
 <div class="spy-ComponentName" id="spy-ComponentName-instanceNumber" />
 ```
 
-You can use the `selector` function to return a selector that will match *all* instances of a rendered double. So for the example above, calling `spySelector(Child)` will return `"div[class=spy-Child]"`.
+You can use the `selector` function to return a selector that will match _all_
+instances of a rendered double. So for the example above, calling
+`spySelector(Child)` will return `"div[class=spy-Child]"`.
 
-You can use the `instanceSelector(n)` to return a selector that matches a specific instance of the component.
+You can use the `instanceSelector(n)` to return a selector that matches a
+specific instance of the component.
 
 ## Triggering two-way bindings
 
-If your stubbed component uses a two-way binding you can trigger that binding to update using the `updateBoundValue` function.
+If your stubbed component uses a two-way binding you can trigger that binding to
+update using the `updateBoundValue` function.
 
 For example, say you have the component `TagList` which can be used like this:
 
 ```html
-<TagList bind:tags={tags} />
+<TagList bind:tags="{tags}" />
 ```
 
 Then you can test how your component responds to updates to `tags` like this:
@@ -173,26 +167,58 @@ TagList.firstInstance().updateBoundValue(
   component, "tags", ["a", "b", "c"]);
 ```
 
-**Warning:** `updateBoundValue` has been tested with Svelte version 3.16. It is incompatible with 3.15 and below.
+## Stubbing component methods
+
+If your component exports methods, you'll need to stub these manually on the
+mounted component instance. To make this easier, the `componentDouble` function
+accepts an `onInit` callback, which will be called with each newly-constructed
+component instance.
+
+For example, with Vitest:
+
+```svelte
+<!-- MyComponent.svelte -->
+<script>
+  export function doSomething() {
+    console.log('Did something!');
+  }
+</script>
+```
+
+```js
+// In your test file:
+import MyComponent from "./MyComponent.svelte";
+
+vi.mock("./MyComponent.svelte", async () => ({
+  default: componentDouble("MyComponent", {
+    onInit: (component, _props) => {
+      component.doSomething = vi.fn();
+    },
+  }),
+}));
+
+it("Calls the component's doSomething method", () => {
+  expect(MyComponent.lastInstance().doSomething).toHaveBeenCalledOnce();
+});
+```
 
 ### Component property reference
 
 All of these functions are available on your component double type.
 
-| Property/function | Type | Description |
-| ----------------- | ---- | ----------- |
-| `instances` | Array of instances | Each instance of the component that has been rendered. |
-| `reset()` | Function | Resets a mocked component between tests. Call this in your `beforeEach` block. |
-| `selector()` | Function | Selector for _all_ instances of this double. |
-| `instanceSelector(n)` | Function | Selector for a single instances of this double. |
-| `findMatching(matchFn)` | Function | Find the call whose props match the `matchFn` predicate |
-| `firstInstance()` | Function | Returns the first instance of a component, which you an then manipulate using functions such as `updateBoundValue` (see note above). |
-| `lastInstance()` | Function | Returns the last instance of a component. |
-| `getInstanceFromElement(domElement)` | Function | Returns the component instance that rendered the given DOM element. |
-| `mountedInstances()` | Function | Returns only the instances that are currently rendered in the DOM. |
-| `propsOfAllInstances()` | Function | Returns an array for props for each of the rendered instance of this component.|
-| `dispatch(event)` | Function | Dispatches an event to the last rendered component. You can also call `dispatch` on individual instances. |
-
+| Property/function                    | Type               | Description                                                                                                                          |
+| ------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `instances`                          | Array of instances | Each instance of the component that has been rendered.                                                                               |
+| `reset()`                            | Function           | Resets a mocked component between tests. Call this in your `beforeEach` block.                                                       |
+| `selector()`                         | Function           | Selector for _all_ instances of this double.                                                                                         |
+| `instanceSelector(n)`                | Function           | Selector for a single instances of this double.                                                                                      |
+| `findMatching(matchFn)`              | Function           | Find the call whose props match the `matchFn` predicate                                                                              |
+| `firstInstance()`                    | Function           | Returns the first instance of a component, which you an then manipulate using functions such as `updateBoundValue` (see note above). |
+| `lastInstance()`                     | Function           | Returns the last instance of a component.                                                                                            |
+| `getInstanceFromElement(domElement)` | Function           | Returns the component instance that rendered the given DOM element.                                                                  |
+| `mountedInstances()`                 | Function           | Returns only the instances that are currently rendered in the DOM.                                                                   |
+| `propsOfAllInstances()`              | Function           | Returns an array for props for each of the rendered instance of this component.                                                      |
+| `dispatch(event)`                    | Function           | Dispatches an event to the last rendered component. You can also call `dispatch` on individual instances.                            |
 
 ## Contributing
 

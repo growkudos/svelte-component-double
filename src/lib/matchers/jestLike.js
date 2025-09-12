@@ -19,7 +19,7 @@ export const toBeRenderedIn = (componentDouble, container) => {
 export function toBeRenderedWithPropsIn(componentDouble, props, container) {
   const allRenderedProps = componentDouble.instances
     .map((instance, index) => {
-      if (instance.$$.fragment) {
+      if (instance.isMounted()) {
         return [index, instance.getNonSpyProps()];
       } else {
         return null;
