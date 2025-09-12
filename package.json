@@ -46,7 +46,7 @@
     "svelte": "^5.0.0"
   },
   "optionalDependencies": {
-    "vitest": ">= 0.25"
+    "vitest": ">= 3.2"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",
