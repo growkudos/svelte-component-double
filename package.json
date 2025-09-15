@@ -45,7 +45,7 @@
   "peerDependencies": {
     "svelte": "^5.0.0"
   },
-  "optionalDependencies": {
+  "optionalPeerDependencies": {
     "vitest": ">= 0.25"
   },
   "devDependencies": {
