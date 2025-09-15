@@ -1,11 +1,13 @@
 import type { Component, ComponentInternals } from "svelte";
 
-import ComponentDouble, {
+import InternalComponentDouble, {
   instanceSelector,
   spySelector,
-} from "./ComponentDouble.svelte";
+} from "./InternalComponentDouble.svelte";
 
-export type ComponentDoubleInstance = ReturnType<typeof ComponentDouble> & {
+export type ComponentDouble = ReturnType<typeof componentDouble>
+
+export type ComponentDoubleInstance = ReturnType<typeof InternalComponentDouble> & {
   updateBoundValue: (component: any, propName: string, value: any) => void;
 };
 
@@ -13,7 +15,7 @@ export function componentDouble(
   originalOrName: Component | string,
   opts: {
     onInit?: (
-      component: ReturnType<typeof ComponentDouble>,
+      component: ReturnType<typeof InternalComponentDouble>,
       props: Record<string, any>
     ) => void;
   } = {}
@@ -32,7 +34,7 @@ export function componentDouble(
       _spyInstance: instances.length,
     });
 
-    const component = Object.assign(ComponentDouble(internals, extendedProps), {
+    const component = Object.assign(InternalComponentDouble(internals, extendedProps), {
       updateBoundValue: (_component: any, propName: string, value: any) => {
         // In Svelte 5, there's not really a difference between setting a prop and
         // updating a bound value. It might be nice to validate that the prop is
