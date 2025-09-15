@@ -5,7 +5,7 @@ import ComponentDouble, {
   spySelector,
 } from "./ComponentDouble.svelte";
 
-type ComponentDoubleInstance = ReturnType<typeof ComponentDouble> & {
+export type ComponentDoubleInstance = ReturnType<typeof ComponentDouble> & {
   updateBoundValue: (component: any, propName: string, value: any) => void;
 };
 
