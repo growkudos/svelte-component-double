@@ -15,9 +15,11 @@ export function componentDouble(
   originalOrName: Component | string,
   opts: {
     onInit?: (
-      component: ReturnType<typeof InternalComponentDouble>,
+      componentInstance: ComponentDoubleInstance,
       props: Record<string, any>
     ) => void;
+    // TODO: with generics, it should be possible to allow onInit to augment the
+    // type of ComponentDoubleInstance. But would that be worth the complexity?
   } = {}
 ) {
   let instances: ComponentDoubleInstance[] = [];
@@ -47,8 +49,6 @@ export function componentDouble(
     });
 
     opts.onInit?.(component, props);
-
-    instances.push(component);
 
     return component;
   };
